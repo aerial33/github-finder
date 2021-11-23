@@ -3,7 +3,7 @@
   "editor.formatOnSave": true,
   "files.associations": {
     "*.js": "javascriptreact"
-  }
+  },
   "[javascript]": {
     "editor.formatOnSave": false
   },
