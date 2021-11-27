@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navabar from "./components/layout/Navbar";
 import User from "./components/users/User";
@@ -11,9 +11,10 @@ import About from "./components/pages/About";
 function App() {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
+  const [repos, setRepos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [alert, setAlert] = useState();
+  const [alert, setAlert] = useState(null);
 
   // * Search Github users
   const searchUsers = async () => {
@@ -44,8 +45,26 @@ function App() {
       const data = await response.json();
       // console.log(data.items);
       if (data && !data.error) {
-        console.log(data);
         setUser(data);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // * Get users Repos
+  const getUserRepos = async (username) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+      );
+      const data = await response.json();
+      // console.log(data.items);
+      if (data && !data.error) {
+        setRepos(data);
       }
     } catch (error) {
       console.log(error);
@@ -59,7 +78,7 @@ function App() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (search === "") {
-      setAlert({ msg: "Please enter something", type: "light" });
+      showAlert("Please enter something", "light");
     }
     setSearch(search);
     searchUsers();
@@ -72,12 +91,11 @@ function App() {
     setIsLoading(false);
   };
 
-  // * set Alert 5s if null
-  useEffect(() => {
-    setTimeout(() => {
-      setAlert("");
-    }, 5000);
-  }, [alert]);
+  // * set Alert 5s
+  const showAlert = (msg, type) => {
+    setAlert({ msg, type });
+    setTimeout(() => setAlert(null), 5000);
+  };
 
   return (
     <Router>
@@ -102,7 +120,6 @@ function App() {
                       showClear={
                         undefined !== users && users.length > 0 ? true : false
                       }
-                      setAlert={alert}
                     />
                     <Users users={users} loading={isLoading} />
                   </>
@@ -113,7 +130,13 @@ function App() {
                 exact
                 path="/user/:gitlogin"
                 element={
-                  <User getUser={getUser} user={user} loading={isLoading} />
+                  <User
+                    getUser={getUser}
+                    user={user}
+                    getRepos={getUserRepos}
+                    repos={repos}
+                    loading={isLoading}
+                  />
                 }
               />
             </Routes>

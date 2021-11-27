@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
+import Repos from "../repos/Repos";
 
-const User = ({ getUser, user, loading }) => {
+const User = ({ getUser, user, loading, getRepos, repos }) => {
   const params = useParams();
   const gitlogin = params.gitlogin;
   useEffect(() => {
     getUser(gitlogin);
+    getRepos(gitlogin);
   }, []);
   const {
     name,
@@ -87,6 +89,7 @@ const User = ({ getUser, user, loading }) => {
         <div className="badge badge-light">Public Repos: {public_repos}</div>
         <div className="badge badge-dark">Public Gists: {public_gist}</div>
       </div>
+      <Repos repos={repos} />
     </>
   );
 };
