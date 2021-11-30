@@ -1,6 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import useFetch from "./components/hooks/useFetch";
 import Navabar from "./components/layout/Navbar";
 import User from "./components/users/User";
 import Users from "./components/users/Users";
@@ -15,19 +16,15 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [alert, setAlert] = useState(null);
+  const { get } = useFetch("https://api.github.com/");
 
   // * Search Github users
   const searchUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `https://api.github.com/search/users?q=${search}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-      );
-      const data = await response.json();
-      // console.log(data.items);
-      if (data && !data.error) {
-        setUsers(data.items);
-      }
+      const getData = await get(`search/users?q=${search}`);
+      // console.log(getData.items);
+      setUsers(getData.items);
     } catch (error) {
       console.log(error);
     } finally {
@@ -39,14 +36,10 @@ function App() {
   const getUser = async (username) => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `https://api.github.com/users/${username}?&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
-      );
-      const data = await response.json();
-      // console.log(data.items);
-      if (data && !data.error) {
-        setUser(data);
-      }
+      const dataUser = await get(`users/${username}?`);
+      // console.log(dataUser);
+
+      setUser(dataUser);
     } catch (error) {
       console.log(error);
     } finally {
@@ -58,14 +51,11 @@ function App() {
   const getUserRepos = async (username) => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+      const dataRepos = await get(
+        `users/${username}/repos?per_page=5&sort=created:asc}`
       );
-      const data = await response.json();
-      // console.log(data.items);
-      if (data && !data.error) {
-        setRepos(data);
-      }
+      // console.log(dataRepos);
+      setRepos(dataRepos);
     } catch (error) {
       console.log(error);
     } finally {
