@@ -26,14 +26,3 @@ const useFetch = (baseUrl) => {
 };
 
 export default useFetch;
-
-// export function request(path, options = {}) {
-//   const {
-//     headers,
-//     query = null,
-//     method = 'GET',
-//     body,
-//     host = hosts.MAIN_SERVICE,
-//     ...extraOpts
-//   } = options;
-//   assertPath(path);
